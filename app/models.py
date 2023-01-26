@@ -9,4 +9,5 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     hashed_password = Column(String, index=True)
+    access_code = Column(Integer, index=True)
     is_active = Column(Boolean, default=True)

@@ -7,14 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import SessionLocal, engine
 from sqlalchemy.orm import Session
 import crud, models, schemas, auth
+import RPi.GPIO as GPIO
+import time
 import os
-
-
-# ----------------
-#  Final API assignment
-# ----------------
-# Yannick Hendrickx
-# r0615765
 
 # make database dir if it doesn't exist
 if not os.path.exists('.\sqlitedb'):
@@ -81,7 +76,7 @@ async def create_user(user: schemas.userAdd, db: Session = Depends(get_db)):
 
 # Get all users
 @app.get("/users/", response_model=list[schemas.user])
-async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
 
@@ -107,4 +102,30 @@ async def update_user(user_id: int, user: schemas.userAdd, db: Session = Depends
     db_user = crud.update_user(db, user_id=user_id, user=user)
     return db_user
 
-# Open lock
+# Get specific user
+@app.get("/users/code/{user_access_code}", response_model=schemas.user)
+async def read_user(user_access_code: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, user_access_code=user_access_code)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found!")
+    return db_user
+
+@app.get("/lock/")
+async def control_lock():
+    GPIO.cleanup()
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+
+    deur_1 = 17
+
+    GPIO.setup(deur_1, GPIO.OUT)
+    GPIO.output(deur_1, 1)
+
+    def deur_1_openen():
+        print("deur open")
+        GPIO.output(deur_1, 0)
+        time.sleep(0.1)
+        GPIO.output(deur_1, 1)
+
+    while true:
+        deur_1_openen()

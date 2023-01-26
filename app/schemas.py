@@ -12,6 +12,6 @@ class user(userBase):
     id: int
     is_active: bool
     hashed_password: str
-
+    access_code: int
     class Config:
         orm_mode = True
