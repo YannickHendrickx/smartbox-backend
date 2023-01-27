@@ -20,7 +20,7 @@ def get_user(db: Session, user_id: int):
     return user_by_id
 
 # get user by provided access code
-def get_user(db: Session, user_access_code: int):
+def get_userid(db: Session, user_access_code: int):
     user_by_code = db.query(models.User).filter(models.User.access_code == user_access_code).first()
     return user_by_code
 
