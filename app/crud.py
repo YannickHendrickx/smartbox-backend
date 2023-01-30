@@ -47,6 +47,20 @@ def update_user(db: Session, user_id: int, user: schemas.userAdd):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     db_user.name = user.name
     db_user.password = hashed_password
+    db_user.is_active = user.is_active
+    db_user.access_code = user.access_code
     db.commit()
     db.refresh(db_user)
     return db_user
+
+# get all logs
+def get_log(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Log).offset(skip).limit(limit).all()
+
+# Add new log to user
+def create_user_log(db: Session, log: schemas.userAdd, user_id: int):
+    db_log = models.Log(**log.dict(), owner_id=user_id)
+    db.add(db_log)
+    db.commit()
+    db.refresh(db_log)
+    return db_log

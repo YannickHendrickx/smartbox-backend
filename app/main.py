@@ -82,7 +82,7 @@ async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
 # Get specific user
 @app.get("/users/{user_id}", response_model=schemas.user)
-async def read_user(user_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found!")
@@ -109,6 +109,17 @@ async def read_user(user_access_code: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found!")
     return db_user
+
+# Add a new log to specific user
+@app.post("/users/{user_id}/logs/", response_model=schemas.Log)
+async def create_user_log(user_id: int, log: schemas.LogAdd, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    return crud.create_user_log(db=db, log=log, user_id=user_id)
+
+# Get all logs
+@app.get("/logs/", response_model=list[schemas.Log])
+async def read_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    logs = crud.get_log(db, skip=skip, limit=limit)
+    return logs
 
 """ @app.get("/lock/{door_id}")
 async def control_lock(door_id: int):
