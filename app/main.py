@@ -121,7 +121,7 @@ async def read_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
     logs = crud.get_log(db, skip=skip, limit=limit)
     return logs
 
-""" @app.get("/lock/{door_id}")
+@app.get("/lock/{door_id}")
 async def control_lock(door_id: int):
     GPIO.cleanup()
     GPIO.setmode(GPIO.BCM)
@@ -142,4 +142,4 @@ async def control_lock(door_id: int):
     print(f"deur {door_id} open")
     GPIO.output(deur_keuze, 0)
     time.sleep(0.1)
-    GPIO.output(deur_keuze, 1) """
+    GPIO.output(deur_keuze, 1)
