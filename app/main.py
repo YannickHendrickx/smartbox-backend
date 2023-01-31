@@ -36,7 +36,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"]
 )
 
@@ -82,7 +82,7 @@ async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
 # Get specific user
 @app.get("/users/{user_id}", response_model=schemas.user)
-async def read_user(user_id: int, db: Session = Depends(get_db)):
+async def read_user(user_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found!")
@@ -97,8 +97,8 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), token: str = 
     return db_user
 
 # Update specific user
-@app.put("/users/{user_id}")
-async def update_user(user_id: int, user: schemas.userAdd, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+@app.patch("/users/{user_id}")
+async def update_user(user_id: int, user: schemas.userPatch, db: Session = Depends(get_db)):
     db_user = crud.update_user(db, user_id=user_id, user=user)
     return db_user
 
@@ -112,12 +112,12 @@ async def read_user(user_access_code: int, db: Session = Depends(get_db)):
 
 # Add a new log to specific user
 @app.post("/users/{user_id}/logs/", response_model=schemas.Log)
-async def create_user_log(user_id: int, log: schemas.LogAdd, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def create_user_log(user_id: int, log: schemas.LogAdd, db: Session = Depends(get_db)):
     return crud.create_user_log(db=db, log=log, user_id=user_id)
 
 # Get all logs
 @app.get("/logs/", response_model=list[schemas.Log])
-async def read_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     logs = crud.get_log(db, skip=skip, limit=limit)
     return logs
 

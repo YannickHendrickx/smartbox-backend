@@ -27,7 +27,7 @@ def get_userid(db: Session, user_access_code: int):
 # Add new user
 def create_user(db: Session, user: schemas.userAdd):
     hashed_password = auth.get_password_hash(user.password)
-    access_code = random.randint(1000,9999)
+    access_code = str(random.randint(1000,9999))
     db_user = models.User(name=user.name, hashed_password=hashed_password, access_code=access_code)
     db.add(db_user)
     db.commit()
@@ -42,11 +42,8 @@ def delete_user(db: Session, user_id: int):
     return db_user
 
 # Update specific user
-def update_user(db: Session, user_id: int, user: schemas.userAdd):
-    hashed_password = auth.get_password_hash(user.password)
+def update_user(db: Session, user_id: int, user: schemas.userPatch):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
-    db_user.name = user.name
-    db_user.password = hashed_password
     db_user.is_active = user.is_active
     db_user.access_code = user.access_code
     db.commit()

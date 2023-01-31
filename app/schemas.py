@@ -19,16 +19,18 @@ class Log(LogBase):
 class userBase(BaseModel):
     name: str
 
+class userPatch(BaseModel):
+    is_active: bool
+    access_code: str
+
 class userAdd(userBase):
     password: str
-    is_active: bool
-    access_code: int
 
 class user(userBase):
     id: int
     is_active: bool
     hashed_password: str
-    access_code: int
+    access_code: str
     logs: list[Log] = []
     class Config:
         orm_mode = True
